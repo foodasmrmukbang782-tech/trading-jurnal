@@ -563,3 +563,4 @@ let tradingJournal;
 document.addEventListener('DOMContentLoaded', () => {
     tradingJournal = new TradingJournal();
 });
+
