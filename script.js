@@ -7,7 +7,7 @@ class TradingJournal {
         this.deleteTradeId = null;
         
         // ✅ MULTIPLE CORS PROXY OPTIONS
-        this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMUQkD9x_gSMrMFbwZcZn4iaK9YUKo7oU6rJliRkKVDppBFawkmqzgAJi43UAIxVhE/exec';
+        this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEnqGlnDILMxBloY5sRRCwYJJ1V4m2AgRJW6WReQ5wXHwx8Uk5QDTeZG1iZlCdPI0Z/exec';
         this.CORS_PROXIES = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
@@ -563,4 +563,5 @@ let tradingJournal;
 document.addEventListener('DOMContentLoaded', () => {
     tradingJournal = new TradingJournal();
 });
+
 
