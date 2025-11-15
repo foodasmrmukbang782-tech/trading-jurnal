@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Trading Journal</h1>
+            <nav>
+                <ul>
+                    <li><a href="#" id="home-link" class="active">Home</a></li>
+                    <li><a href="#" id="entry-link">Entry</a></li>
+                    <li><a href="#" id="trades-link">Trades</a></li>
+                    <li><a href="#" id="report-link">Report</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Home Section -->
+            <section id="home" class="section active">
+                <h2>Monitor Performa Trading Anda</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Transaksi</h3>
+                        <p id="total-transactions">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Win Rate</h3>
+                        <p id="win-rate">0.0%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>P/L Harian</h3>
+                        <p id="daily-pl">Rp 0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total P/L</h3>
+                        <p id="total-pl">Rp 0</p>
+                    </div>
+                </div>
+                <div style="text-align: center; margin: 20px 0;">
+                    <button onclick="tradingJournal.refreshFromSheet()" class="btn-primary">
+                    🔄 Refresh Data dari Google Sheets
+                    </button>
+                        <p style="font-size: 0.8rem; color: #7f8c8d; margin-top: 5px;">
+                    Data tersimpan di: <a href="https://docs.google.com/spreadsheets/d/1alxT1VD9QnbhRsM5r5QJsKRZ0aVQUoi4PGMGjSpf8sc" target="_blank">Google Sheets</a>
+                    </p>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Equity Curve</h3>
+                        <canvas id="equity-chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Win vs Loss</h3>
+                        <canvas id="win-loss-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="strategy-performance">
+                    <h3>Performa per Strategi</h3>
+                    <div id="strategy-list"></div>
+                </div>
+            </section>
+
+            <!-- Entry Section -->
+            <section id="entry" class="section">
+                <h2>Input Jurnal</h2>
+                <p>Catat transaksi trading Anda</p>
+                
+                <form id="trade-form">
+                    <div class="form-group">
+                        <label for="entry-date">Tanggal Entry *</label>
+                        <input type="date" id="entry-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exit-date">Tanggal Exit *</label>
+                        <input type="date" id="exit-date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stock-code">Kode Saham *</label>
+                        <input type="text" id="stock-code" placeholder="Contoh: BBCA" required>
+                    </div>
+                      
+                    <div class="form-group">
+                        <label for="entry-price">Harga Masuk (Rp) *</label>
+                        <input type="number" id="entry-price" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="exit-price">Harga Keluar (Rp) *</label>
+                        <input type="number" id="exit-price" min="0" step="0.01" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="lot">Jumlah Lot *</label>
+                        <input type="number" id="lot" min="1" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fee">Fee Broker (%)</label>
+                        <input type="number" id="fee" value="0.4026" step="0.0001" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="strategy">Strategi Trading *</label>
+                        <select id="strategy" required>
+                            <option value="Scalping">Scalping</option>
+                            <option value="Intraday">Intraday</option>
+                            <option value="Swing">Swing</option>
+                            <option value="Position">Position</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Catatan Transaksi</label>
+                        <textarea id="notes" placeholder="Tulis catatan tentang trading ini..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn-primary">Simpan Trade</button>
+                </form>
+                
+                <div class="navigation">
+                    <a href="#" class="nav-link" data-target="home">Home</a>
+                    <a href="#" class="nav-link" data-target="entry">Entry</a>
+                    <a href="#" class="nav-link" data-target="trades">Trades</a>
+                    <a href="#" class="nav-link" data-target="report">Report</a>
+                </div>
+            </section>
+
+            <!-- Trades Section -->
+            <section id="trades" class="section">
+                <h2>Semua Transaksi</h2>
+                <p id="trades-count">0 transaksi tercatat</p>
+                
+                <div id="trades-list"></div>
+                
+                <div class="navigation">
+                    <a href="#" class="nav-link" data-target="home">Home</a>
+                    <a href="#" class="nav-link" data-target="entry">Entry</a>
+                    <a href="#" class="nav-link" data-target="trades">Trades</a>
+                    <a href="#" class="nav-link" data-target="report">Report</a>
+                </div>
+            </section>
+
+            <!-- Report Section -->
+            <!-- Report Section -->
+            <section id="report" class="section">
+                <h2>Laporan Harian</h2>
+                <p id="report-date">Sabtu, 15 November 2025</p>
+                
+                <div class="stats-grid">
+                    <!-- HAPUS: Total Buy dan Total Sell -->
+                    <div class="stat-card">
+                        <h3>Win Rate</h3>
+                        <p id="daily-win-rate">0.0%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total P/L</h3>
+                        <p id="daily-pl-total">Rp 0</p>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h3>Profit/Loss per Transaksi</h3>
+                    <table id="report-table">
+                        <thead>
+                            <tr>
+                                <th>Saham</th>
+                                <!-- HAPUS: Kolom Type -->
+                                <th>Strategy</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>Lot</th>
+                                <th>P/L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="navigation">
+                    <a href="#" class="nav-link" data-target="home">Home</a>
+                    <a href="#" class="nav-link" data-target="entry">Entry</a>
+                    <a href="#" class="nav-link" data-target="trades">Trades</a>
+                    <a href="#" class="nav-link" data-target="report">Report</a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal for Success Message -->
+    <div id="success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Data berhasil ditambahkan!</p>
+        </div>
+    </div>
+
+    <!-- Modal for Delete Confirmation -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <p>Apakah Anda yakin ingin menghapus transaksi ini?</p>
+            <div class="modal-buttons">
+                <button id="confirm-delete" class="btn-danger">Hapus</button>
+                <button id="cancel-delete" class="btn-secondary">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

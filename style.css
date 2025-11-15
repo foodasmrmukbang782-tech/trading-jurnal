@@ -1,0 +1,444 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f7fa;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+}
+
+header h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+}
+
+nav ul li {
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+nav ul li a:hover, nav ul li a.active {
+    background-color: #34495e;
+}
+
+.section {
+    display: none;
+}
+
+.section.active {
+    display: block;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.stat-card h3 {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+    margin-bottom: 2rem;
+}
+
+.chart-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.chart-card h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.strategy-performance {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.strategy-performance h3 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.strategy-item {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.strategy-item:last-child {
+    border-bottom: none;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.btn-danger {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #ecf0f1;
+}
+
+.nav-link {
+    margin: 0 10px;
+    color: #3498db;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+.trade-item {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.trade-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.stock-code {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.transaction-type {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.transaction-type.buy {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.transaction-type.sell {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.trade-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 1rem;
+}
+
+.trade-detail {
+    font-size: 0.9rem;
+}
+
+.trade-detail span {
+    font-weight: bold;
+}
+
+.trade-pl {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.trade-pl.positive {
+    color: #2ecc71;
+}
+
+.trade-pl.negative {
+    color: #e74c3c;
+}
+
+.delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: #e74c3c;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.table-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f8f9fa;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 400px;
+    position: relative;
+    text-align: center;
+}
+
+.close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .stats-grid, .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    nav ul li {
+        margin: 5px 0;
+    }
+    
+    .trade-details {
+        grid-template-columns: 1fr;
+    }
+}
+.delete-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #e74c3c;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(231, 76, 60, 0.3);
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(231, 76, 60, 0.4);
+}
+
+.delete-btn:active {
+    transform: scale(0.95);
+}
+
+/* Trash icon menggunakan emoji */
+.delete-btn::before {
+    content: "🗑";
+    font-size: 1rem;
+}
+
+/* Jika ingin menggunakan Font Awesome, tambahkan di HTML:
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+*/
+
+/* Style untuk P/L positive (profit) */
+.pl-positive {
+    color: #2ecc71 !important;
+    font-weight: bold;
+}
+
+/* Style untuk P/L negative (loss) */
+.pl-negative {
+    color: #e74c3c !important;
+    font-weight: bold;
+}
+
+/* Style untuk P/L zero */
+.pl-zero {
+    color: #7f8c8d !important;
+    font-weight: bold;
+}
+
+/* Untuk stats-grid dengan 2 kolom di report */
+#report .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
