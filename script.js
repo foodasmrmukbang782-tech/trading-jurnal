@@ -1,4 +1,4 @@
-// Trading Journal Application - Integrated with Google Apps Script
+// Trading Journal Application - Integrated with Google Apps Script & CORS Proxy
 class TradingJournal {
     constructor() {
         this.trades = [];
@@ -6,8 +6,9 @@ class TradingJournal {
         this.winLossChart = null;
         this.deleteTradeId = null;
         
-        // ✅ URL APPS SCRIPT ANDA
-        this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxEnqGlnDILMxBloY5sRRCwYJJ1V4m2AgRJW6WReQ5wXHwx8Uk5QDTeZG1iZlCdPI0Z/exec';
+        // ✅ GUNAKAN CORS PROXY
+        this.APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwMUQkD9x_gSMrMFbwZcZn4iaK9YUKo7oU6rJliRkKVDppBFawkmqzgAJi43UAIxVhE/exec';
+        this.CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // Free CORS proxy
         
         this.init();
     }
@@ -79,18 +80,23 @@ class TradingJournal {
         });
     }
     
-    // ✅ LOAD DATA DARI APPS SCRIPT (REPLACE CSV METHOD)
-    async loadTradesFromSheet() {
+    // ✅ LOAD DATA DENGAN CORS PROXY
+    loadTradesFromSheet = async () => {
         try {
-            console.log('🔄 Loading data from Google Apps Script...');
+            console.log('🔄 Loading data via CORS proxy...');
             
-            const response = await fetch(this.APPS_SCRIPT_URL);
+            const proxyUrl = this.CORS_PROXY + this.APPS_SCRIPT_URL;
+            const response = await fetch(proxyUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+            
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('📊 API Response:', result);
             
             if (result.status === 'success') {
                 this.trades = result.data.map(trade => ({
@@ -106,21 +112,57 @@ class TradingJournal {
                     notes: trade.notes,
                     netPL: parseFloat(trade.netPL),
                     isWin: trade.isWin === 'WIN',
-                    date: trade.entryDate // untuk kompatibilitas dengan code existing
+                    date: trade.entryDate
                 }));
                 
-                console.log(`✅ Successfully loaded ${this.trades.length} trades from Apps Script`);
+                console.log(`✅ Successfully loaded ${this.trades.length} trades via proxy`);
+                this.updateDashboard();
+                this.renderTrades();
+                this.updateReport();
                 
             } else {
                 throw new Error(result.message);
             }
             
         } catch (error) {
-            console.error('❌ Error loading from Apps Script:', error);
+            console.error('❌ Error loading via proxy:', error);
             
-            // Fallback ke localStorage
+            // Fallback: coba direct access
+            try {
+                console.log('🔄 Trying direct access...');
+                const response = await fetch(this.APPS_SCRIPT_URL);
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    this.trades = result.data.map(trade => ({
+                        id: trade.id,
+                        entryDate: trade.entryDate,
+                        exitDate: trade.exitDate,
+                        stockCode: trade.stockCode,
+                        entryPrice: parseFloat(trade.entryPrice),
+                        exitPrice: parseFloat(trade.exitPrice),
+                        lot: parseInt(trade.lot),
+                        fee: parseFloat(trade.fee),
+                        strategy: trade.strategy,
+                        notes: trade.notes,
+                        netPL: parseFloat(trade.netPL),
+                        isWin: trade.isWin === 'WIN',
+                        date: trade.entryDate
+                    }));
+                    
+                    console.log(`✅ Successfully loaded ${this.trades.length} trades directly`);
+                    this.updateDashboard();
+                    this.renderTrades();
+                    this.updateReport();
+                    return;
+                }
+            } catch (directError) {
+                console.log('❌ Direct access also failed');
+            }
+            
+            // Final fallback ke localStorage
             this.trades = JSON.parse(localStorage.getItem('trades')) || [];
-            console.log('📦 Using localStorage as fallback');
+            console.log('📦 Using localStorage as final fallback');
         }
     }
     
@@ -158,7 +200,7 @@ class TradingJournal {
         }
     }
     
-    // ✅ UPDATE HANDLE FORM SUBMIT UNTUK APPS SCRIPT
+    // ✅ HANDLE FORM SUBMIT DENGAN CORS PROXY
     async handleFormSubmit(e) {
         e.preventDefault();
         
@@ -267,19 +309,21 @@ class TradingJournal {
             notes: document.getElementById('notes') ? document.getElementById('notes').value : ''
         };
         
-        await this.addTrade(tradeData);
+        await this.saveTrade(tradeData);
         this.resetForm();
     }
     
-    // ✅ UPDATE ADD TRADE UNTUK APPS SCRIPT
-    async addTrade(tradeData) {
+    // ✅ SAVE TRADE DENGAN CORS PROXY
+    saveTrade = async (tradeData) => {
         try {
-            console.log('💾 Saving trade to Google Apps Script...', tradeData);
+            console.log('💾 Saving trade via CORS proxy...', tradeData);
             
-            const response = await fetch(this.APPS_SCRIPT_URL, {
+            const proxyUrl = this.CORS_PROXY + this.APPS_SCRIPT_URL;
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     action: 'ADD_TRADE',
@@ -291,15 +335,13 @@ class TradingJournal {
             console.log('💫 Save Response:', result);
             
             if (result.status === 'success') {
-                console.log('✅ Trade saved successfully with ID:', result.id);
+                console.log('✅ Trade saved successfully via proxy');
                 this.showSuccess('Trade berhasil disimpan! ID: ' + result.id);
                 this.resetForm();
                 
                 // Refresh data setelah save
                 setTimeout(() => {
-                    this.loadTradesFromSheet().then(() => {
-                        this.updateAllViews();
-                    });
+                    this.loadTradesFromSheet();
                 }, 1000);
                 
                 return true;
@@ -308,9 +350,40 @@ class TradingJournal {
             }
             
         } catch (error) {
-            console.error('❌ Error saving trade:', error);
+            console.error('❌ Error saving via proxy:', error);
             
-            // Fallback: simpan ke localStorage
+            // Fallback: try direct POST
+            try {
+                console.log('🔄 Trying direct POST...');
+                const response = await fetch(this.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'ADD_TRADE',
+                        data: tradeData
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    console.log('✅ Trade saved successfully directly');
+                    this.showSuccess('Trade berhasil disimpan! ID: ' + result.id);
+                    this.resetForm();
+                    
+                    setTimeout(() => {
+                        this.loadTradesFromSheet();
+                    }, 1000);
+                    
+                    return true;
+                }
+            } catch (directError) {
+                console.log('❌ Direct POST also failed');
+            }
+            
+            // Final fallback: simpan ke localStorage
             const fallbackTrade = {
                 id: Date.now().toString(),
                 ...tradeData,
@@ -322,16 +395,15 @@ class TradingJournal {
             
             this.trades.push(fallbackTrade);
             localStorage.setItem('trades', JSON.stringify(this.trades));
-            this.showSuccessModal();
+            this.showSuccess('Trade disimpan lokal (offline mode)');
             this.updateAllViews();
             
-            alert('⚠️ Data disimpan lokal. Refresh nanti untuk sync ke Google Sheets.');
             return false;
         }
     }
     
-    // ✅ UPDATE DELETE TRADE UNTUK APPS SCRIPT
-    async deleteTrade(id) {
+    // ✅ DELETE TRADE DENGAN CORS PROXY
+    deleteTrade = async (id) => {
         try {
             console.log('🗑️ Deleting trade with ID:', id);
             
@@ -339,10 +411,12 @@ class TradingJournal {
                 throw new Error('ID trade tidak valid');
             }
             
-            const response = await fetch(this.APPS_SCRIPT_URL, {
+            const proxyUrl = this.CORS_PROXY + this.APPS_SCRIPT_URL;
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify({
                     action: 'DELETE_TRADE',
@@ -354,15 +428,13 @@ class TradingJournal {
             console.log('🗑️ Delete Response:', result);
             
             if (result.status === 'success') {
-                console.log('✅ Trade deleted successfully');
+                console.log('✅ Trade deleted successfully via proxy');
                 this.showSuccess('Trade berhasil dihapus!');
                 
                 // Refresh data setelah delete
                 setTimeout(() => {
-                    this.loadTradesFromSheet().then(() => {
-                        this.updateAllViews();
-                        this.closeModals();
-                    });
+                    this.loadTradesFromSheet();
+                    this.closeModals();
                 }, 500);
                 
                 return true;
@@ -371,28 +443,59 @@ class TradingJournal {
             }
             
         } catch (error) {
-            console.error('❌ Error deleting trade:', error);
+            console.error('❌ Error deleting via proxy:', error);
             
-            // Fallback: hapus dari localStorage
+            // Fallback: try direct DELETE
+            try {
+                console.log('🔄 Trying direct DELETE...');
+                const response = await fetch(this.APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'DELETE_TRADE',
+                        id: id
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    console.log('✅ Trade deleted successfully directly');
+                    this.showSuccess('Trade berhasil dihapus!');
+                    
+                    setTimeout(() => {
+                        this.loadTradesFromSheet();
+                        this.closeModals();
+                    }, 500);
+                    
+                    return true;
+                }
+            } catch (directError) {
+                console.log('❌ Direct DELETE also failed');
+            }
+            
+            // Final fallback: hapus dari localStorage
             this.trades = this.trades.filter(trade => trade.id !== id);
             localStorage.setItem('trades', JSON.stringify(this.trades));
             this.updateAllViews();
             this.closeModals();
+            this.showSuccess('Trade dihapus dari lokal (offline mode)');
             
-            alert('✅ Data dihapus dari lokal. Refresh nanti untuk sync ke Google Sheets.');
             return false;
         }
     }
     
-    // ✅ REFRESH FROM SHEET (UNTUK BUTTON REFRESH)
+    // ✅ REFRESH FROM SHEET
     async refreshFromSheet() {
         await this.loadTradesFromSheet();
         this.updateAllViews();
         this.showSuccess('Data berhasil di-refresh dari Google Sheets!');
     }
     
-    // ✅ CALCULATE P/L (UNTUK FALLBACK)
-    calculatePL(entryPrice, exitPrice, lot, fee = 0.004026) {
+    // ✅ CALCULATE P/L
+    calculatePL = (entryPrice, exitPrice, lot, fee = 0.004026) => {
         const shares = lot * 100;
         const grossPL = (exitPrice - entryPrice) * shares;
         const totalFee = (entryPrice + exitPrice) * shares * fee;
